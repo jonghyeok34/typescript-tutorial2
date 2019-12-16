@@ -1,12 +1,21 @@
 import { GithubApiService } from "./GithubApiService";
+import * as _ from "lodash";
 import { User } from "./Users";
 import { Repo } from "./Repo";
 
 let svc = new GithubApiService();
-svc.getUserInfo("jonghyeok34", (user: User) => {
-  console.log(user);
-});
 
-svc.getRepos("jonghyeok34", (repos: Repo[]) => {
-  console.log(repos);
-});
+if (process.argv.length < 3) {
+  console.log("Please pass the user name as an argument");
+} else {
+  let username = process.argv[2];
+  svc.getUserInfo(username, (user: User) => {
+    svc.getRepos(username, (repos: Repo[]) => {
+      let sortedRepos = _.sortBy(repos, [(repo: Repo) => repo.forkCount]);
+
+      let filteredRepos = _.take(sortedRepos, 5);
+      user.repos = filteredRepos;
+      console.log(user);
+    });
+  });
+}

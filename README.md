@@ -598,3 +598,72 @@ svc.getRepos("jonghyeok34", (repos: Repo[]) => {
   console.log(repos);
 });
 ```
+
+## using lodash/ process.argv
+
+1. index.ts
+
+- using lodash - sort, take
+
+```ts
+import { GithubApiService } from "./GithubApiService";
+import * as _ from "lodash";
+import { User } from "./Users";
+import { Repo } from "./Repo";
+
+let svc = new GithubApiService();
+
+let username = "jonghyeok";
+svc.getUserInfo(username, (user: User) => {
+  svc.getRepos(username, (repos: Repo[]) => {
+    // sort by fork count
+    let sortedRepos = _.sortBy(repos, [(repo: Repo) => repo.forkCount]);
+
+    //get top5 repos
+    let filteredRepos = _.take(sortedRepos, 5);
+    user.repos = filteredRepos;
+    console.log(user);
+  });
+});
+```
+
+- using process.arv
+
+```ts
+import { GithubApiService } from "./GithubApiService";
+import * as _ from "lodash";
+import { User } from "./Users";
+import { Repo } from "./Repo";
+
+let svc = new GithubApiService();
+
+if (process.argv.length < 3) {
+  console.log("Please pass the user name as an argument");
+} else {
+  //get argument which is in third index
+  let username = process.argv[2];
+  svc.getUserInfo(username, (user: User) => {
+    svc.getRepos(username, (repos: Repo[]) => {
+      let sortedRepos = _.sortBy(repos, [(repo: Repo) => repo.forkCount]);
+
+      let filteredRepos = _.take(sortedRepos, 5);
+      user.repos = filteredRepos;
+      console.log(user);
+    });
+  });
+}
+```
+
+- start with argument
+
+```
+npm start jonghyeok34
+```
+
+process.argv
+
+```js
+[ '/usr/bin/node' // node,
+  '/path/25-projects/out/index.js' //index.js path,
+  'jonghyeok34' // argument]
+```
